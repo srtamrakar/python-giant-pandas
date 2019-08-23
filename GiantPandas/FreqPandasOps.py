@@ -19,7 +19,7 @@ class FreqPandasOps(object):
 	def get_row_count_from_dataframe(cls, dataframe=None):
 		"""
 		Fastest way to count dataframe rows.
-		:param dataframe: pandas.dataFrame
+		:param dataframe: pandas.DataFrame
 		:return:
 			row count as int
 		"""
@@ -137,6 +137,7 @@ class FreqPandasOps(object):
 		"""
 		return any('unnamed' in col.lower() for col in dataframe.columns)
 
+	@classmethod
 	def exists_column(cls, dataframe=None, column_name_list=None):
 		"""
 		:param dataframe: pandas.DataFrame
