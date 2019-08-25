@@ -16,7 +16,7 @@ class FreqPandasOps(object):
 		pass
 
 	@classmethod
-	def get_row_count_from_dataframe(cls, dataframe=None):
+	def get_row_count(cls, dataframe=None):
 		"""
 		Fastest way to count dataframe rows.
 		:param dataframe: pandas.DataFrame
@@ -26,9 +26,9 @@ class FreqPandasOps(object):
 		return len(dataframe.index)
 
 	@classmethod
-	def get_dictionary_from_two_dataframe_columns(cls, dataframe=None,
-												  key_column=None, value_column=None,
-												  keep_duplicate_keys=None):
+	def get_dictionary_from_two_columns(cls, dataframe=None,
+										key_column=None, value_column=None,
+										keep_duplicate_keys=None):
 		"""
 		:param dataframe: pandas.DataFrame
 		:param key_column: str
@@ -42,9 +42,9 @@ class FreqPandasOps(object):
 		if keep_duplicate_keys.lower() not in ['first', 'last']:
 			keep_duplicate_keys = False
 
-		dataframe_ = dataframe[[key_column, value_column]]
+		dataframe_ = dataframe[[key_column, value_column]].copy()
 		dataframe_.drop_duplicates(subset=[key_column], keep=keep_duplicate_keys, inplace=True)
-		return pd.Series(dataframe[value_column].values, index=dataframe[key_column]).to_dict()
+		return pd.Series(dataframe_[value_column].values, index=dataframe_[key_column]).to_dict()
 
 	@classmethod
 	def get_dataframe_with_all_permutations_from_dict(cls, dict_with_list_values=None):
