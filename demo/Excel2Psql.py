@@ -81,7 +81,9 @@ def main():
 								   password=args['password'])
 
 	logger.info('Uploading dataframe to psql table {0}."{1}" ...'.format(args['schema'], args['table']))
-	psql_connector.send_dataframe_to_psql(dataframe=df, schema_name=args['schema'], table_name=args['table'])
+	psql_connector.send_dataframe_to_psql(dataframe=df,
+										  schema_name=args['schema'], table_name=args['table'],
+										  if_exists=args['if_exists'])
 
 	logger.info(py_logger.as_header_style('END: Uploading excel to psql'))
 	return

@@ -83,12 +83,11 @@ class PsqlConnector(PandasOps):
 		if if_exists == 'replace':
 			self._drop_table(schema_name=schema_name, table_name=table_name)
 
-		if not self._exists_table(schema_name=schema_name, table_name=table_name):
-			self._create_table(
-				schema_name=schema_name, table_name=table_name,
-				column_name_type_dict=self._get_dict_of_column_name_to_type_from_dataframe_for_psql(
-					dataframe_for_upload)
-			)
+		self._create_table(
+			schema_name=schema_name, table_name=table_name,
+			column_name_type_dict=self._get_dict_of_column_name_to_type_from_dataframe_for_psql(
+				dataframe_for_upload)
+		)
 
 		self._upload_dataframe_to_psql(dataframe=dataframe_for_upload, schema_name=schema_name, table_name=table_name)
 
@@ -163,7 +162,7 @@ class PsqlConnector(PandasOps):
 	def _create_table(self, schema_name=None, table_name=None, column_name_type_dict=None):
 		column_types = ', '.join(['{0} {1}'.format(col_n, col_t)
 								  for col_n, col_t in column_name_type_dict.items()])
-		create_command = 'CREATE TABLE {0}."{1}" ({2});'.format(schema_name, table_name, column_types)
+		create_command = 'CREATE TABLE IF NOT EXISTS {0}."{1}" ({2});'.format(schema_name, table_name, column_types)
 		self._execute_query(query=create_command)
 		return
 
