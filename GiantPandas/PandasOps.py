@@ -10,7 +10,7 @@ import itertools
 from FreqObjectOps import StrOps
 
 
-class FreqPandasOps(object):
+class PandasOps(object):
 
 	def __init__(self):
 		pass

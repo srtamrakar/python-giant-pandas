@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import pandas as pd
 
-from GiantPandas.FreqPandasOps import FreqPandasOps
+from GiantPandas.PandasOps import PandasOps
 
 test_excel_folder = 'tests'
 test_excel_filename = 'test.xlsx'
@@ -15,11 +15,11 @@ test_df = pd.read_excel(test_excel_file)
 
 
 def test_001_get_row_count():
-	assert FreqPandasOps.get_row_count(test_df) == 10
+	assert PandasOps.get_row_count(test_df) == 10
 
 
 def test_002_get_dictionary_from_two_columns_without_duplicate_keys():
-	assert FreqPandasOps.get_dictionary_from_two_columns(
+	assert PandasOps.get_dictionary_from_two_columns(
 		test_df, key_column='key_for_dict', value_column='value_for_dict', keep_duplicate_keys=False
 	) == {
 			   0: 0
@@ -27,7 +27,7 @@ def test_002_get_dictionary_from_two_columns_without_duplicate_keys():
 
 
 def test_003_get_dictionary_from_two_columns_with_first_values():
-	assert FreqPandasOps.get_dictionary_from_two_columns(
+	assert PandasOps.get_dictionary_from_two_columns(
 		test_df, key_column='key_for_dict', value_column='value_for_dict', keep_duplicate_keys='first'
 	) == {
 			   0: 0,
@@ -38,7 +38,7 @@ def test_003_get_dictionary_from_two_columns_with_first_values():
 
 
 def test_004_get_dictionary_from_two_columns_with_last_values():
-	assert FreqPandasOps.get_dictionary_from_two_columns(
+	assert PandasOps.get_dictionary_from_two_columns(
 		test_df, key_column='key_for_dict', value_column='value_for_dict', keep_duplicate_keys='LAST'
 	) == {
 			   0: 0,
@@ -50,12 +50,12 @@ def test_004_get_dictionary_from_two_columns_with_last_values():
 
 def test_005_set_column_as_index():
 	df = test_df.copy()
-	FreqPandasOps.set_column_as_index(df, column_name='id', drop_original_column=False)
+	PandasOps.set_column_as_index(df, column_name='id', drop_original_column=False)
 	assert df.index.name == 'id'
 
 
 def test_006_get_dict_of_column_name_to_type():
-	assert FreqPandasOps.get_dict_of_column_name_to_type(test_df) == {
+	assert PandasOps.get_dict_of_column_name_to_type(test_df) == {
 		'id': 'int64',
 		'all strings': 'object',
 		'all_int': 'int64',
@@ -72,23 +72,23 @@ def test_006_get_dict_of_column_name_to_type():
 
 def test_007_get_column_names_by_type():
 	assert (
-			FreqPandasOps.get_column_names_by_type(test_df, 'object') == ['all strings'] and
-			FreqPandasOps.get_column_names_by_type(test_df, 'datetime64[ns]') == ['updated date']
+			PandasOps.get_column_names_by_type(test_df, 'object') == ['all strings'] and
+			PandasOps.get_column_names_by_type(test_df, 'datetime64[ns]') == ['updated date']
 	)
 
 
 def test_008_contains_all_integer_in_float_column():
 	assert (
-			FreqPandasOps.contains_all_integer_in_float_column(test_df, 'id') == True and
-			FreqPandasOps.contains_all_integer_in_float_column(test_df, 'float with nans') == False and
-			FreqPandasOps.contains_all_integer_in_float_column(test_df, ' # int with nan # ') == True
+			PandasOps.contains_all_integer_in_float_column(test_df, 'id') == True and
+			PandasOps.contains_all_integer_in_float_column(test_df, 'float with nans') == False and
+			PandasOps.contains_all_integer_in_float_column(test_df, ' # int with nan # ') == True
 
 	)
 
 
 def test_009_set_column_names_to_alpha_numeric():
 	df = test_df.copy()
-	FreqPandasOps.set_column_names_to_alpha_numeric(df)
+	PandasOps.set_column_names_to_alpha_numeric(df)
 	assert list(df.columns) == ['id', 'all_strings', 'all_int', 'float_with_nans', '_int_with_nan_',
 								'camelCase', 'Unnamed_6', 'alphanumeric123', 'updated_date',
 								'key_for_dict', 'value_for_dict']
@@ -96,22 +96,22 @@ def test_009_set_column_names_to_alpha_numeric():
 
 def test_010_set_column_names_to_snake_case():
 	df = test_df.copy()
-	FreqPandasOps.set_column_names_to_snake_case(df)
+	PandasOps.set_column_names_to_snake_case(df)
 	assert list(df.columns) == ['id', 'all_strings', 'all_int', 'float_with_nans', 'int_with_nan',
 								'camel_case', 'unnamed_6', 'alphanumeric_123', 'updated_date',
 								'key_for_dict', 'value_for_dict']
 
 
 def test_011_exists_unnamed_headers():
-	assert FreqPandasOps.exists_unnamed_headers(test_df) == True
+	assert PandasOps.exists_unnamed_headers(test_df) == True
 
 
 def test_012_exists_column():
 	assert (
-			FreqPandasOps.exists_column(test_df, ['id']) == True and
-			FreqPandasOps.exists_column(test_df, ['id', 'float_with_nans']) == False
+			PandasOps.exists_column(test_df, ['id']) == True and
+			PandasOps.exists_column(test_df, ['id', 'float_with_nans']) == False
 	)
 
 
 def test_013_get_maximum_length_of_dtype_object_values():
-	assert FreqPandasOps.get_maximum_length_of_dtype_object_values(test_df, 'all strings') == 4
+	assert PandasOps.get_maximum_length_of_dtype_object_values(test_df, 'all strings') == 4
