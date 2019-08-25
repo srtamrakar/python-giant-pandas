@@ -7,6 +7,8 @@ Some special functions and connectors for Pandas.
 * pandas>=0.25.0
 * pytest>=5.0.1
 * Unidecode>=1.0.22
+* FreqObjectOps>=0.0.4
+* DailyLogger>=0.1.0 (for demo)
 
 
 ## Install with pip
@@ -23,19 +25,38 @@ $ pip install GiantPandas
 
 #### ```PandasOps```
 
-1. ```get_row_count(dataframe)```
-1. ```get_dictionary_from_two_columns(dataframe, key_column, value_column, keep_duplicate_keys)```
-1. ```get_dataframe_with_all_permutations_from_dict(dict_with_list_values)```
-1. ```set_column_as_index(dataframe, column_name, drop_original_column)```
-1. ```get_dict_of_column_name_to_type(dataframe)```
-1. ```get_column_names_by_type(dataframe, column_dtype)```
-1. ```contains_all_integer_in_float_column(dataframe, column_name)```
-1. ```set_column_names_to_alpha_numeric(dataframe)```
-1. ```set_column_names_to_snake_case(dataframe)```
-1. ```exists_unnamed_headers(dataframe)```
-1. ```exists_column(dataframe, column_name_list)```
-1. ```get_maximum_length_of_dtype_object_values(dataframe, column_name)```
+1. ```get_row_count(dataframe)```: get row count of a dataframe
+1. ```get_dictionary_from_two_columns(dataframe, key_column, value_column, keep_duplicate_keys)```: get dictionary from two dataframe columns
+1. ```get_dataframe_with_all_permutations_from_dict(dict_with_list_values)```: create dataframe with all possible permutations from dict with values of type list
+1. ```set_column_as_index(dataframe, column_name, drop_original_column)```: set column as an index
+1. ```get_dict_of_column_name_to_type(dataframe)```: get dict of column name to their dtype
+1. ```get_column_names_by_type(dataframe, column_dtype)```: get all columns of desired dtype
+1. ```contains_all_integer_in_float_column(dataframe, column_name)```: check if all non-nan values in float columns are int
+1. ```set_column_names_to_alpha_numeric(dataframe)```: convert column name to alpha numeric
+1. ```set_column_names_to_snake_case(dataframe)```: convert column name to snake case
+1. ```exists_unnamed_headers(dataframe)```: check if a dataframe contains any unnamed headers
+1. ```exists_column(dataframe, column_name_list)```: check if a dataframe contains desired column
+1. ```get_maximum_length_of_dtype_object_values(dataframe, column_name)```: get maximum length of object in a column
+
+#### ```ExcelConnector```
+1. 	```get_sheet_names(file)```: get all sheet names
+1. 	```get_dataframe_from_excel(file, sheet_name, skip_rows_list)```: read excel sheet into a dataframe
+1. 	```send_dataframe_to_excel(file, dataframe_to_sheet_name_tuple_list, write_index)```: write dataframe to an excel sheet
+
+#### ```PsqlConnector```
+1. ```get_psql_query_results_as_dataframe(query)```: get results of a psql query as a dataframe
+1. ```send_dataframe_to_psql(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
 
 
+#### Demo
 
+Demo script for saving results of PostgreSQL query into an excel file.
+```bash
+$ python3 demo/Psql2Excel.py -f test2.xlsx -H localhost -d postgres -u postgres -t test_table -sn Sheet1
+```
+
+Demo script for uploading a table from excel sheet into a PSQL database.
+```bash
+$ python3 demo/Excel2Psql.py -f tests/test.xlsx -H localhost -d postgres -u postgres -t test_table
+```
 * **&copy; Samyak Ratna Tamrakar** - [Github](https://github.com/srtamrakar), [LinkedIn](https://www.linkedin.com/in/srtamrakar/).
