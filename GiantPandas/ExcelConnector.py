@@ -7,6 +7,7 @@ import xlrd
 import pandas as pd
 
 from FreqObjectOps import DirOps
+from GiantPandas import PandasOps
 
 
 class ExcelConnector(object):
@@ -64,7 +65,7 @@ class ExcelConnector(object):
 
 		writer = pd.ExcelWriter(file, engine='xlsxwriter', options={'strings_to_urls': False})
 		for df, sheet in dataframe_to_sheet_name_tuple_list:
-			if self.get_row_count_from_dataframe(df) == 0:
+			if PandasOps.get_row_count(df) == 0:
 				continue
 			df.to_excel(writer, sheet_name=sheet, index=write_index)
 		writer.save()
