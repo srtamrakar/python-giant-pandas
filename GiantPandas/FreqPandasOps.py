@@ -38,7 +38,7 @@ class FreqPandasOps(object):
 		:return:
 			dictionary of {items from key_column : items from value_column}
 		"""
-		keep_duplicate_keys = str(keep_duplicate_keys)
+		keep_duplicate_keys = str(keep_duplicate_keys).lower()
 		if keep_duplicate_keys.lower() not in ['first', 'last']:
 			keep_duplicate_keys = False
 
@@ -155,6 +155,7 @@ class FreqPandasOps(object):
 		:return:
 			max length of objects in column
 		"""
+
 		def __get_length_of_dtype_object(object_value=None):
 			try:
 				return len(object_value)
