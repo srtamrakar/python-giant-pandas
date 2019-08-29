@@ -26,7 +26,7 @@ $ pip install GiantPandas
 #### ```PandasOps```
 
 1. ```PandasOps.get_row_count(dataframe)```: get row count of a dataframe
-1. ```PandasOps.get_dictionary_from_two_columns(dataframe, key_column, value_column, keep_duplicate_keys)```: get dictionary from two dataframe columns
+1. ```PandasOps.get_dict_from_two_columns(dataframe, key_column, value_column, keep_duplicate_keys)```: get dictionary from two dataframe columns
 1. ```PandasOps.get_dataframe_with_all_permutations_from_dict(dict_with_list_values)```: create dataframe with all possible permutations from dict with values of type list
 1. ```PandasOps.set_column_as_index(dataframe, column_name, drop_original_column)```: set column as an index
 1. ```PandasOps.get_dict_of_column_name_to_type(dataframe)```: get dict of column name to their dtype
