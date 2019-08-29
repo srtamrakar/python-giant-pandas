@@ -25,7 +25,7 @@ arg_parser.add_argument("-H", "--host",
 						help="Host for psql db",
 						type=str)
 
-arg_parser.add_argument("-d", "--database",
+arg_parser.add_argument("-d", "--dbname",
 						required=True,
 						help="Database name",
 						type=str)
@@ -67,7 +67,7 @@ def main():
 
 	logger.info('Initializing PSQL connector ... ')
 	psql_connector = PsqlConnector(host=args['host'],
-								   dbname=args['database'],
+								   dbname=args['dbname'],
 								   username=args['username'],
 								   password=args['password'])
 
