@@ -11,9 +11,12 @@ from GiantPandas import PandasOps
 
 
 class ExcelConnector(object):
+	"""
+	Python module to read / write dataframe from / into xlsx file.
+	"""
 
 	def __init__(self):
-		super().__init__()
+		pass
 
 	@classmethod
 	def get_sheet_names(cls, file=None):
