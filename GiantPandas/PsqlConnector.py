@@ -12,13 +12,19 @@ from GiantPandas import PandasOps
 
 
 class PsqlConnector(object):
-	null_identifier = {
-		'int32': -1234567890,
-		'int64': -1234567890,
+	"""
+	Python module to upload dataframe into PSQL / get PSQL query results as dataframe.
+	"""
+
+	# general csv features
+	CSV_SEPARATOR = '\t'
+	NULL_IDENTIFIER = {
+		'int32': -9223372036854775808,
+		'int64': -9223372036854775808,
 		'general': '#N/A'
 	}
 
-	def __init__(self, host=None, dbname=None, username=None, password=None, port=None, is_redshift=None):
+	def __init__(self, host=None, dbname=None, username=None, password=None, port=None):
 		"""
 		:param host: host of psql db
 		:param dbname: dbname of psql db
@@ -28,14 +34,11 @@ class PsqlConnector(object):
 
 		if None in [host, dbname, username]: return
 		if port is None: port = '5432'
-		if is_redshift is None: is_redshift = False
-		if is_redshift: port = '5439'
 
 		self.__host = host
 		self.__dbname = dbname
 		self.__user = username
 		self.__password = password
-		self.__is_redshift = is_redshift
 		self.__port = port
 
 	def _get_database_connectors(self):
@@ -112,15 +115,12 @@ class PsqlConnector(object):
 	def _upload_dataframe_to_psql(self, dataframe=None, schema_name=None, table_name=None):
 		conn, cur = self._get_database_connectors()
 
-		# general csv features
-		csv_sep = '\t'
-
 		# save dataframe as temp csv
 		csv_io = io.StringIO()
-		dataframe.to_csv(csv_io, sep=csv_sep, encoding='utf-8-sig',
-						 header=False, index=False, na_rep=self.null_identifier['general'])
+		dataframe.to_csv(csv_io, sep=self.CSV_SEPARATOR, encoding='utf-8-sig',
+						 header=False, index=False, na_rep=self.NULL_IDENTIFIER['general'])
 		csv_contents = csv_io.getvalue()
-		csv_contents = re.sub(r'NaT', self.null_identifier['general'], csv_contents)
+		csv_contents = re.sub(r'NaT', self.NULL_IDENTIFIER['general'], csv_contents)
 		csv_io.seek(0)
 		csv_io.write(csv_contents)
 
@@ -128,7 +128,7 @@ class PsqlConnector(object):
 		csv_io.seek(0)
 		cur.copy_from(csv_io, '{0}.{1}'.format(schema_name, table_name),
 					  columns=dataframe.columns.tolist(),
-					  sep=csv_sep, null=self.null_identifier['general'])
+					  sep=self.CSV_SEPARATOR, null=self.NULL_IDENTIFIER['general'])
 		csv_io.close()
 
 		self._close_database_connectors(conn, cur)
@@ -182,13 +182,13 @@ class PsqlConnector(object):
 
 		for float_col in float_column_list:
 			if PandasOps.contains_all_integer_in_float_column(dataframe=dataframe, column_name=float_col):
-				dataframe[float_col] = dataframe[float_col].fillna(self.null_identifier['int64']).astype(int)
+				dataframe[float_col] = dataframe[float_col].fillna(self.NULL_IDENTIFIER['int64']).astype(int)
 		return
 
 	def _get_dict_of_column_name_to_type_from_dataframe_for_psql(self, dataframe=None):
 		pandas_dtype_to_psql_column_type_dict = {
-			"int64": "int",
-			"int32": "int",
+			"int64": "bigint",
+			"int32": "bigint",
 			"float32": "decimal",
 			"float64": "decimal",
 			"datetime64[ns]": "timestamp",
@@ -233,6 +233,6 @@ class PsqlConnector(object):
 				UPDATE {0}.{1}
 				SET {2} = NULL
 				WHERE {2} = {3};
-				'''.format(schema_name, table_name, int_col, self.null_identifier[column_dtype])
+				'''.format(schema_name, table_name, int_col, self.NULL_IDENTIFIER[column_dtype])
 		self._execute_query(query=update_command)
 		return
