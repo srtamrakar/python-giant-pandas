@@ -44,8 +44,17 @@ $ pip install GiantPandas
 1. 	```ExcelConnector.send_dataframe_to_excel(file, dataframe_to_sheet_name_tuple_list, write_index)```: write dataframe to an excel sheet
 
 #### ```PsqlConnector```
-1. ```PsqlConnector.get_psql_query_results_as_dataframe(query)```: get results of a psql query as a dataframe
-1. ```PsqlConnector.send_dataframe_to_psql(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
+First, an instance must be created for establishing connection.
+```python
+psql_connector = PsqlConnector(host='localhost',
+                               dbname='postgres',
+                               username='postgres',
+                               password='',
+                               port='')
+```
+Then,
+1. ```psql_connector.get_psql_query_results_as_dataframe(query)```: get results of a psql query as a dataframe
+1. ```psql_connector.send_dataframe_to_psql(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
 
 
 #### Demo

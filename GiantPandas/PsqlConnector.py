@@ -26,10 +26,16 @@ class PsqlConnector(object):
 
 	def __init__(self, host=None, dbname=None, username=None, password=None, port=None):
 		"""
-		:param host: host of psql db
-		:param dbname: dbname of psql db
-		:param username: username for psql db
-		:param password: password for psql db
+		:param host: str, mandatory
+			host of psql db
+		:param dbname: str, mandatory
+			dbname of psql db
+		:param username: str, mandatory
+			username for psql db
+		:param password: str
+			password for psql db
+		:param port: str
+			port for psql db
 		"""
 
 		if None in [host, dbname, username]: return
