@@ -67,7 +67,7 @@ def main():
 
 	logger.info('Initializing PSQL connector ... ')
 	psql_connector = PsqlConnector(host=args['host'],
-								   database=args['database'],
+								   dbname=args['database'],
 								   username=args['username'],
 								   password=args['password'])
 
