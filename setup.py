@@ -7,7 +7,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md'), encoding = 'utf-
 setup(
 	name = 'GiantPandas',
 	packages = ['GiantPandas'],
-	version = '0.0.1',
+	version = '0.1.0',
 	license = 'MIT',
 	description = 'Some special functions and connectors for Pandas.',
 	long_description = long_description,
@@ -15,7 +15,7 @@ setup(
 	author = 'Samyak Ratna Tamrakar',
 	author_email = 'samyak.r.tamrakar@gmail.com',
 	url = 'https://github.com/srtamrakar/python-giant-pandas',
-	download_url = 'https://github.com/srtamrakar/python-giant-pandas/archive/v_0.0.1.tar.gz',
+	download_url = 'https://github.com/srtamrakar/python-giant-pandas/archive/v_0.1.0.tar.gz',
 	keywords = ['pandas', 'excel', 'postgres', 'psql', 'postgresql', 'redshift'],
 	install_requires = [
 		'numpy>=1.13.3',
@@ -25,13 +25,13 @@ setup(
 		'Unidecode>=1.0.22',
 		'xlrd>=1.2.0',
 		'XlsxWriter>=1.0.2',
-		'DailyLogger>=0.1.1',
+		'DailyLogger>=0.1.2',
 		'FreqObjectOps>=0.1.0',
 	],
 	classifiers = [
-		'Development Status :: 2 - Pre-Alpha',  # Either"3 - Alpha", "4 - Beta" or "5 - Production/Stable"
-		'Intended Audience :: Developers',  # Define that your audience are developers
-		'Topic :: Software Development :: Build Tools',
+		'Development Status :: 3 - Alpha',
+		'Intended Audience :: Data Engineers',
+		'Topic :: Database :: Database Engines/Servers',
 		'License :: OSI Approved :: MIT License',
 		'Programming Language :: Python :: 3',
 		'Programming Language :: Python :: 3.4',
