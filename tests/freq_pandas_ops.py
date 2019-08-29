@@ -19,7 +19,7 @@ def test_001_get_row_count():
 
 
 def test_002_get_dictionary_from_two_columns_without_duplicate_keys():
-	assert PandasOps.get_dictionary_from_two_columns(
+	assert PandasOps.get_dict_from_two_columns(
 		test_df, key_column='key_for_dict', value_column='value_for_dict', keep_duplicate_keys=False
 	) == {
 			   0: 0
@@ -27,7 +27,7 @@ def test_002_get_dictionary_from_two_columns_without_duplicate_keys():
 
 
 def test_003_get_dictionary_from_two_columns_with_first_values():
-	assert PandasOps.get_dictionary_from_two_columns(
+	assert PandasOps.get_dict_from_two_columns(
 		test_df, key_column='key_for_dict', value_column='value_for_dict', keep_duplicate_keys='first'
 	) == {
 			   0: 0,
@@ -38,7 +38,7 @@ def test_003_get_dictionary_from_two_columns_with_first_values():
 
 
 def test_004_get_dictionary_from_two_columns_with_last_values():
-	assert PandasOps.get_dictionary_from_two_columns(
+	assert PandasOps.get_dict_from_two_columns(
 		test_df, key_column='key_for_dict', value_column='value_for_dict', keep_duplicate_keys='LAST'
 	) == {
 			   0: 0,

@@ -25,27 +25,36 @@ $ pip install GiantPandas
 
 #### ```PandasOps```
 
-1. ```get_row_count(dataframe)```: get row count of a dataframe
-1. ```get_dictionary_from_two_columns(dataframe, key_column, value_column, keep_duplicate_keys)```: get dictionary from two dataframe columns
-1. ```get_dataframe_with_all_permutations_from_dict(dict_with_list_values)```: create dataframe with all possible permutations from dict with values of type list
-1. ```set_column_as_index(dataframe, column_name, drop_original_column)```: set column as an index
-1. ```get_dict_of_column_name_to_type(dataframe)```: get dict of column name to their dtype
-1. ```get_column_names_by_type(dataframe, column_dtype)```: get all columns of desired dtype
-1. ```contains_all_integer_in_float_column(dataframe, column_name)```: check if all non-nan values in float columns are int
-1. ```set_column_names_to_alpha_numeric(dataframe)```: convert column name to alpha numeric
-1. ```set_column_names_to_snake_case(dataframe)```: convert column name to snake case
-1. ```exists_unnamed_headers(dataframe)```: check if a dataframe contains any unnamed headers
-1. ```exists_column(dataframe, column_name_list)```: check if a dataframe contains desired column
-1. ```get_maximum_length_of_dtype_object_values(dataframe, column_name)```: get maximum length of object in a column
+1. ```PandasOps.get_row_count(dataframe)```: get row count of a dataframe
+1. ```PandasOps.get_dict_from_two_columns(dataframe, key_column, value_column, keep_duplicate_keys)```: get dictionary from two dataframe columns
+1. ```PandasOps.get_dataframe_with_all_permutations_from_dict(dict_with_list_values)```: create dataframe with all possible permutations from dict with values of type list
+1. ```PandasOps.set_column_as_index(dataframe, column_name, drop_original_column)```: set column as an index
+1. ```PandasOps.get_dict_of_column_name_to_type(dataframe)```: get dict of column name to their dtype
+1. ```PandasOps.get_column_names_by_type(dataframe, column_dtype)```: get all columns of desired dtype
+1. ```PandasOps.contains_all_integer_in_float_column(dataframe, column_name)```: check if all non-nan values in float columns are int
+1. ```PandasOps.set_column_names_to_alpha_numeric(dataframe)```: convert column name to alpha numeric
+1. ```PandasOps.set_column_names_to_snake_case(dataframe)```: convert column name to snake case
+1. ```PandasOps.exists_unnamed_headers(dataframe)```: check if a dataframe contains any unnamed headers
+1. ```PandasOps.exists_column(dataframe, column_name_list)```: check if a dataframe contains desired column
+1. ```PandasOps.get_maximum_length_of_dtype_object_values(dataframe, column_name)```: get maximum length of object in a column
 
 #### ```ExcelConnector```
-1. 	```get_sheet_names(file)```: get all sheet names
-1. 	```get_dataframe_from_excel(file, sheet_name, skip_rows_list)```: read excel sheet into a dataframe
-1. 	```send_dataframe_to_excel(file, dataframe_to_sheet_name_tuple_list, write_index)```: write dataframe to an excel sheet
+1. 	```ExcelConnector.get_sheet_names(file)```: get all sheet names
+1. 	```ExcelConnector.get_dataframe_from_excel(file, sheet_name, skip_rows_list)```: read excel sheet into a dataframe
+1. 	```ExcelConnector.send_dataframe_to_excel(file, dataframe_to_sheet_name_tuple_list, write_index)```: write dataframe to an excel sheet
 
 #### ```PsqlConnector```
-1. ```get_psql_query_results_as_dataframe(query)```: get results of a psql query as a dataframe
-1. ```send_dataframe_to_psql(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
+First, an instance must be created for establishing connection.
+```python
+psql_connector = PsqlConnector(host='localhost',
+                               dbname='postgres',
+                               username='postgres',
+                               password='',
+                               port='')
+```
+Then,
+1. ```psql_connector.get_psql_query_results_as_dataframe(query)```: get results of a psql query as a dataframe
+1. ```psql_connector.send_dataframe_to_psql(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
 
 
 #### Demo

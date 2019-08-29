@@ -6,39 +6,55 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 import re
 import io
 import pandas as pd
-from sqlalchemy import create_engine
+import psycopg2
 
 from GiantPandas import PandasOps
 
 
-class PsqlConnector(PandasOps):
-	null_identifier = {
-		'int32': -1234567890,
-		'int64': -1234567890,
+class PsqlConnector(object):
+	"""
+	Python module to upload dataframe into PSQL / get PSQL query results as dataframe.
+	"""
+
+	# general csv features
+	_csv_sep = '\t'
+	_csv_null_identifier = {
+		'int32': -9223372036854775808,
+		'int64': -9223372036854775808,
 		'general': '#N/A'
 	}
 
-	def __init__(self, host=None, database=None, username=None, password=None):
+	def __init__(self, host=None, dbname=None, username=None, password=None, port=None):
 		"""
-		:param host: host of psql db
-		:param database: dbname of psql db
-		:param username: username for psql db
-		:param password: password for psql db
+		:param host: str, mandatory
+			host of psql db
+		:param dbname: str, mandatory
+			dbname of psql db
+		:param username: str, mandatory
+			username for psql db
+		:param password: str
+			password for psql db
+		:param port: str
+			port for psql db
 		"""
-		super().__init__()
-		self.host = host
-		self.database = database
-		self.username = username
-		self.password = password
+
+		if None in [host, dbname, username]: return
+		if port is None: port = '5432'
+
+		self.__host = host
+		self.__dbname = dbname
+		self.__user = username
+		self.__password = password
+		self.__port = port
 
 	def _get_database_connectors(self):
-		db_conn_string = 'postgresql://{0}:{1}@{2}/{3}'.format(
-			self.username, self.password, self.host, self.database
-		)
-		engine = create_engine(db_conn_string)
-		conn = engine.raw_connection()
+		conn = psycopg2.connect(host=self.__host,
+								user=self.__user,
+								password=self.__password,
+								dbname=self.__dbname,
+								port=self.__port)
 		cur = conn.cursor()
-		return engine, conn, cur
+		return conn, cur
 
 	def _close_database_connectors(self, conn=None, cur=None):
 		conn.commit()
@@ -53,8 +69,8 @@ class PsqlConnector(PandasOps):
 		:return:
 			pandas dataframe with results from psql query
 		"""
-		engine, conn, cur = self._get_database_connectors()
-		df = pd.read_sql_query(query, con=engine)
+		conn, cur = self._get_database_connectors()
+		df = pd.read_sql_query(query, con=conn)
 		self._close_database_connectors(conn, cur)
 		return df
 
@@ -76,8 +92,8 @@ class PsqlConnector(PandasOps):
 		dataframe_for_upload = dataframe.copy()
 
 		self._correct_float_columns(dataframe_for_upload)
-		self.set_column_names_to_alpha_numeric(dataframe_for_upload)
-		self.set_column_names_to_snake_case(dataframe_for_upload)
+		PandasOps.set_column_names_to_alpha_numeric(dataframe_for_upload)
+		PandasOps.set_column_names_to_snake_case(dataframe_for_upload)
 		self._clean_delimiter_in_object_columns_from_dataframe(dataframe_for_upload)
 
 		if if_exists == 'replace':
@@ -103,17 +119,14 @@ class PsqlConnector(PandasOps):
 		return
 
 	def _upload_dataframe_to_psql(self, dataframe=None, schema_name=None, table_name=None):
-		engine, conn, cur = self._get_database_connectors()
-
-		# general csv features
-		csv_sep = '\t'
+		conn, cur = self._get_database_connectors()
 
 		# save dataframe as temp csv
 		csv_io = io.StringIO()
-		dataframe.to_csv(csv_io, sep=csv_sep, encoding='utf-8-sig',
-						 header=False, index=False, na_rep=self.null_identifier['general'])
+		dataframe.to_csv(csv_io, sep=self._csv_sep, encoding='utf-8-sig',
+						 header=False, index=False, na_rep=self._csv_null_identifier['general'])
 		csv_contents = csv_io.getvalue()
-		csv_contents = re.sub(r'NaT', self.null_identifier['general'], csv_contents)
+		csv_contents = re.sub(r'NaT', self._csv_null_identifier['general'], csv_contents)
 		csv_io.seek(0)
 		csv_io.write(csv_contents)
 
@@ -121,7 +134,7 @@ class PsqlConnector(PandasOps):
 		csv_io.seek(0)
 		cur.copy_from(csv_io, '{0}.{1}'.format(schema_name, table_name),
 					  columns=dataframe.columns.tolist(),
-					  sep=csv_sep, null=self.null_identifier['general'])
+					  sep=self._csv_sep, null=self._csv_null_identifier['general'])
 		csv_io.close()
 
 		self._close_database_connectors(conn, cur)
@@ -133,7 +146,7 @@ class PsqlConnector(PandasOps):
 		return psql_array
 
 	def _execute_query(self, query=None):
-		engine, conn, cur = self._get_database_connectors()
+		conn, cur = self._get_database_connectors()
 		cur.execute(query)
 		self._close_database_connectors(conn, cur)
 		return
@@ -167,21 +180,21 @@ class PsqlConnector(PandasOps):
 		return
 
 	def _correct_float_columns(self, dataframe=None):
-		float_32_column_list = self.get_column_names_by_type(dataframe=dataframe, column_dtype='float32')
-		float_64_column_list = self.get_column_names_by_type(dataframe=dataframe, column_dtype='float64')
+		float_32_column_list = PandasOps.get_column_names_by_type(dataframe=dataframe, column_dtype='float32')
+		float_64_column_list = PandasOps.get_column_names_by_type(dataframe=dataframe, column_dtype='float64')
 		float_column_list = float_32_column_list + float_64_column_list
 
 		if len(float_column_list) == 0: return
 
 		for float_col in float_column_list:
-			if self.contains_all_integer_in_float_column(dataframe=dataframe, column_name=float_col):
-				dataframe[float_col] = dataframe[float_col].fillna(self.null_identifier['int64']).astype(int)
+			if PandasOps.contains_all_integer_in_float_column(dataframe=dataframe, column_name=float_col):
+				dataframe[float_col] = dataframe[float_col].fillna(self._csv_null_identifier['int64']).astype(int)
 		return
 
 	def _get_dict_of_column_name_to_type_from_dataframe_for_psql(self, dataframe=None):
 		pandas_dtype_to_psql_column_type_dict = {
-			"int64": "int",
-			"int32": "int",
+			"int64": "bigint",
+			"int32": "bigint",
 			"float32": "decimal",
 			"float64": "decimal",
 			"datetime64[ns]": "timestamp",
@@ -189,7 +202,7 @@ class PsqlConnector(PandasOps):
 			"array[object]": "character varying(256)[]"
 		}
 
-		pandas_column_name_type_dict = self.get_dict_of_column_name_to_type(dataframe)
+		pandas_column_name_type_dict = PandasOps.get_dict_of_column_name_to_type(dataframe)
 		psql_column_name_type_dict = dict()
 
 		for k, v in pandas_column_name_type_dict.items():
@@ -197,7 +210,7 @@ class PsqlConnector(PandasOps):
 				psql_column_name_type_dict[k] = pandas_dtype_to_psql_column_type_dict[v]
 			else:
 				max_number_of_characters = \
-					self.get_maximum_length_of_dtype_object_values(dataframe=dataframe, column_name=k)
+					PandasOps.get_maximum_length_of_dtype_object_values(dataframe=dataframe, column_name=k)
 				if max_number_of_characters <= 2056:
 					psql_column_name_type_dict[k] = 'character varying({})'.format(max_number_of_characters)
 				else:
@@ -206,7 +219,7 @@ class PsqlConnector(PandasOps):
 		return psql_column_name_type_dict
 
 	def _clean_delimiter_in_object_columns_from_dataframe(self, dataframe=None):
-		object_column_list = self.get_column_names_by_type(dataframe=dataframe, column_dtype='object')
+		object_column_list = PandasOps.get_column_names_by_type(dataframe=dataframe, column_dtype='object')
 		for obj_col in object_column_list:
 			dataframe[obj_col] = dataframe[obj_col].str. \
 				replace('\t', ' ', regex=True). \
@@ -217,7 +230,7 @@ class PsqlConnector(PandasOps):
 		return
 
 	def _update_null_in_columns(self, dataframe=None, column_dtype=None, schema_name=None, table_name=None):
-		int_columns = self.get_column_names_by_type(dataframe=dataframe, column_dtype=column_dtype)
+		int_columns = PandasOps.get_column_names_by_type(dataframe=dataframe, column_dtype=column_dtype)
 		if len(int_columns) < 1: return
 
 		update_command = ''
@@ -226,6 +239,6 @@ class PsqlConnector(PandasOps):
 				UPDATE {0}.{1}
 				SET {2} = NULL
 				WHERE {2} = {3};
-				'''.format(schema_name, table_name, int_col, self.null_identifier[column_dtype])
+				'''.format(schema_name, table_name, int_col, self._csv_null_identifier[column_dtype])
 		self._execute_query(query=update_command)
 		return

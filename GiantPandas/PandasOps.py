@@ -26,9 +26,9 @@ class PandasOps(object):
 		return len(dataframe.index)
 
 	@classmethod
-	def get_dictionary_from_two_columns(cls, dataframe=None,
-										key_column=None, value_column=None,
-										keep_duplicate_keys=None):
+	def get_dict_from_two_columns(cls, dataframe=None,
+								  key_column=None, value_column=None,
+								  keep_duplicate_keys=None):
 		"""
 		:param dataframe: pandas.DataFrame
 		:param key_column: str
