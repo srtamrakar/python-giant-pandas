@@ -4,11 +4,15 @@ Some special functions and connectors for Pandas.
 ## Requirements
 
 * Python 3+ (Tested in 3.7)
+* numpy>=1.13.3
 * pandas>=0.25.0
 * pytest>=5.0.1
+* psycopg2-binary>=2.8.3
 * Unidecode>=1.0.22
-* FreqObjectOps>=0.0.4
-* DailyLogger>=0.1.0 (for demo)
+* xlrd>=1.2.0
+* XlsxWriter>=1.0.2
+* DailyLogger>=0.1.2
+* FreqObjectOps>=0.1.0
 
 
 ## Install with pip
