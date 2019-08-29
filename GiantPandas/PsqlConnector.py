@@ -17,8 +17,8 @@ class PsqlConnector(object):
 	"""
 
 	# general csv features
-	CSV_SEPARATOR = '\t'
-	NULL_IDENTIFIER = {
+	_csv_sep = '\t'
+	_csv_null_identifier = {
 		'int32': -9223372036854775808,
 		'int64': -9223372036854775808,
 		'general': '#N/A'
@@ -123,10 +123,10 @@ class PsqlConnector(object):
 
 		# save dataframe as temp csv
 		csv_io = io.StringIO()
-		dataframe.to_csv(csv_io, sep=self.CSV_SEPARATOR, encoding='utf-8-sig',
-						 header=False, index=False, na_rep=self.NULL_IDENTIFIER['general'])
+		dataframe.to_csv(csv_io, sep=self._csv_sep, encoding='utf-8-sig',
+						 header=False, index=False, na_rep=self._csv_null_identifier['general'])
 		csv_contents = csv_io.getvalue()
-		csv_contents = re.sub(r'NaT', self.NULL_IDENTIFIER['general'], csv_contents)
+		csv_contents = re.sub(r'NaT', self._csv_null_identifier['general'], csv_contents)
 		csv_io.seek(0)
 		csv_io.write(csv_contents)
 
@@ -134,7 +134,7 @@ class PsqlConnector(object):
 		csv_io.seek(0)
 		cur.copy_from(csv_io, '{0}.{1}'.format(schema_name, table_name),
 					  columns=dataframe.columns.tolist(),
-					  sep=self.CSV_SEPARATOR, null=self.NULL_IDENTIFIER['general'])
+					  sep=self._csv_sep, null=self._csv_null_identifier['general'])
 		csv_io.close()
 
 		self._close_database_connectors(conn, cur)
@@ -188,7 +188,7 @@ class PsqlConnector(object):
 
 		for float_col in float_column_list:
 			if PandasOps.contains_all_integer_in_float_column(dataframe=dataframe, column_name=float_col):
-				dataframe[float_col] = dataframe[float_col].fillna(self.NULL_IDENTIFIER['int64']).astype(int)
+				dataframe[float_col] = dataframe[float_col].fillna(self._csv_null_identifier['int64']).astype(int)
 		return
 
 	def _get_dict_of_column_name_to_type_from_dataframe_for_psql(self, dataframe=None):
@@ -239,6 +239,6 @@ class PsqlConnector(object):
 				UPDATE {0}.{1}
 				SET {2} = NULL
 				WHERE {2} = {3};
-				'''.format(schema_name, table_name, int_col, self.NULL_IDENTIFIER[column_dtype])
+				'''.format(schema_name, table_name, int_col, self._csv_null_identifier[column_dtype])
 		self._execute_query(query=update_command)
 		return
