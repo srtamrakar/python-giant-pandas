@@ -101,8 +101,7 @@ class PsqlConnector(object):
 
 		self._create_table(
 			schema_name=schema_name, table_name=table_name,
-			column_name_type_dict=self._get_dict_of_column_name_to_type_from_dataframe_for_psql(
-				dataframe_for_upload)
+			column_name_type_dict=self._get_dict_of_column_name_to_type_from_dataframe_for_psql(dataframe_for_upload)
 		)
 
 		self._upload_dataframe_to_psql(dataframe=dataframe_for_upload, schema_name=schema_name, table_name=table_name)
