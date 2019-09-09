@@ -194,8 +194,8 @@ class PsqlConnector(object):
 		pandas_dtype_to_psql_column_type_dict = {
 			"int64": "bigint",
 			"int32": "bigint",
-			"float32": "decimal",
-			"float64": "decimal",
+			"float32": "double precision",
+			"float64": "double precision",
 			"datetime64[ns]": "timestamp",
 			"bool": "boolean",
 			"array[object]": "character varying(256)[]"
