@@ -5,6 +5,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
 import re
 import io
+import math
 import pandas as pd
 import psycopg2
 
@@ -210,6 +211,8 @@ class PsqlConnector(object):
 			else:
 				max_number_of_characters = \
 					PandasOps.get_maximum_length_of_dtype_object_values(dataframe=dataframe, column_name=k)
+				max_number_of_characters = math.ceil(1.25 * max_number_of_characters)
+
 				if max_number_of_characters <= 2056:
 					psql_column_name_type_dict[k] = 'character varying({})'.format(max_number_of_characters)
 				else:
