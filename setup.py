@@ -7,7 +7,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md'), encoding = 'utf-
 setup(
 	name = 'GiantPandas',
 	packages = ['GiantPandas'],
-	version = '0.1.4',
+	version = '0.1.5',
 	license = 'MIT',
 	description = 'Some special functions and connectors for Pandas.',
 	long_description = long_description,
@@ -15,7 +15,7 @@ setup(
 	author = 'Samyak Ratna Tamrakar',
 	author_email = 'samyak.r.tamrakar@gmail.com',
 	url = 'https://github.com/srtamrakar/python-giant-pandas',
-	download_url = 'https://github.com/srtamrakar/python-giant-pandas/archive/v_0.1.4.tar.gz',
+	download_url = 'https://github.com/srtamrakar/python-giant-pandas/archive/v_0.1.5.tar.gz',
 	keywords = ['pandas', 'excel', 'postgres', 'psql', 'postgresql', 'redshift'],
 	install_requires = [
 		'numpy>=1.13.3',
