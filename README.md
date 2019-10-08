@@ -72,4 +72,5 @@ Demo script for uploading a table from excel sheet into a PSQL database.
 ```bash
 $ python3 demo/Excel2Psql.py -f tests/test.xlsx -H localhost -d postgres -u postgres -t test_table
 ```
-* **&copy; Samyak Ratna Tamrakar** - [Github](https://github.com/srtamrakar), [LinkedIn](https://www.linkedin.com/in/srtamrakar/).
+
+**&copy; [Samyak Ratna Tamrakar](https://www.linkedin.com/in/srtamrakar/)**, 2019.
