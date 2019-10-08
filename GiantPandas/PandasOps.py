@@ -158,7 +158,7 @@ class PandasOps(object):
 
 		def __get_length_of_dtype_object(object_value=None):
 			try:
-				return len(object_value)
+				return len(object_value.encode('utf-8'))
 			except:
 				return 1
 
