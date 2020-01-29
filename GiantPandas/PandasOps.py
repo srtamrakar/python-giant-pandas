@@ -29,7 +29,7 @@ class PandasOps(object):
         dataframe: pd.DataFrame = None,
         key_column: str = None,
         value_column: str = None,
-        keep_duplicate_keys: str = None,
+        keep_duplicate_keys: Union[str, bool] = None,
     ) -> dict:
         """
         :param dataframe: pandas.DataFrame

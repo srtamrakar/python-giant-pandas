@@ -1,21 +1,20 @@
-import os.path
+import os
 import sys
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-
 import re
 import io
 import math
-import pandas as pd
 import psycopg2
-
+import pandas as pd
+from typing import NoReturn, Dict
 from GiantPandas import PandasOps
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 
 class PsqlConnector(object):
     """
-	Python module to upload dataframe into PSQL / get PSQL query results as dataframe.
-	"""
+    Python module to upload dataframe into PSQL / get PSQL query results as dataframe.
+    """
 
     # general csv features
     _csv_sep = "\t"
@@ -25,22 +24,29 @@ class PsqlConnector(object):
         "general": "#N/A",
     }
 
-    def __init__(self, host=None, dbname=None, username=None, password=None, port=None):
+    def __init__(
+        self,
+        host: str = None,
+        dbname: str = None,
+        username: str = None,
+        password: str = None,
+        port: str = None,
+    ) -> NoReturn:
         """
-		:param host: str, mandatory
-			host of psql db
-		:param dbname: str, mandatory
-			dbname of psql db
-		:param username: str, mandatory
-			username for psql db
-		:param password: str
-			password for psql db
-		:param port: str
-			port for psql db
-		"""
+        :param host: str, mandatory
+            host of psql db
+        :param dbname: str, mandatory
+            dbname of psql db
+        :param username: str, mandatory
+            username for psql db
+        :param password: str
+            password for psql db
+        :param port: str
+            port for psql db
+        """
 
         if None in [host, dbname, username]:
-            return
+            return None
         if port is None:
             port = "5432"
 
@@ -61,39 +67,43 @@ class PsqlConnector(object):
         cur = conn.cursor()
         return conn, cur
 
-    def _close_database_connectors(self, conn=None, cur=None):
+    def _close_database_connectors(self, conn=None, cur=None) -> NoReturn:
         conn.commit()
         cur.close()
         conn.close()
-        return
+        return None
 
-    def get_psql_query_results_as_dataframe(self, query=None):
+    def get_psql_query_results_as_dataframe(self, query: str = None) -> pd.DataFrame:
         """
-		:param query: str
-			a psql query
-		:return:
-			pandas dataframe with results from psql query
-		"""
+        :param query: str
+            a psql query
+        :return:
+            pandas dataframe with results from psql query
+        """
         conn, cur = self._get_database_connectors()
         df = pd.read_sql_query(query, con=conn)
         self._close_database_connectors(conn, cur)
         return df
 
     def send_dataframe_to_psql(
-        self, dataframe=None, schema_name=None, table_name=None, if_exists=None
-    ):
+        self,
+        dataframe: pd.DataFrame = None,
+        schema_name: str = None,
+        table_name: str = None,
+        if_exists: str = None,
+    ) -> NoReturn:
         """
-		:param dataframe: pandas.DataFrame
-		:param schema_name: str
-		:param table_name: str
-		:param if_exists: 'replace' | 'append'
-		:return:
-			uploads a dataframe to a psql table
-		"""
+        :param dataframe: pandas.DataFrame
+        :param schema_name: str
+        :param table_name: str
+        :param if_exists: 'replace' | 'append'
+        :return:
+            uploads a dataframe to a psql table
+        """
         if dataframe is None:
-            return
+            return None
         if table_name is None:
-            return
+            return None
         if schema_name is None:
             schema_name = "public"
         if str(if_exists).lower() not in ["replace", "append"]:
@@ -136,11 +146,12 @@ class PsqlConnector(object):
             column_dtype="int32",
         )
 
-        return
-
     def _upload_dataframe_to_psql(
-        self, dataframe=None, schema_name=None, table_name=None
-    ):
+        self,
+        dataframe: pd.DataFrame = None,
+        schema_name: str = None,
+        table_name: str = None,
+    ) -> NoReturn:
         conn, cur = self._get_database_connectors()
 
         # save dataframe as temp csv
@@ -173,46 +184,47 @@ class PsqlConnector(object):
 
         self._close_database_connectors(conn, cur)
 
-        return
-
-    def _get_psql_array_format_of_python_list(self, python_list=None):
+    def _get_psql_array_format_of_python_list(self, python_list: list = None) -> str:
         psql_array = "({0})".format(str(python_list)[1:-1])
         return psql_array
 
-    def _execute_query(self, query=None):
+    def _execute_query(self, query: str = None) -> NoReturn:
         conn, cur = self._get_database_connectors()
         cur.execute(query)
         self._close_database_connectors(conn, cur)
-        return
 
-    def _exists_table(self, schema_name=None, table_name=None):
+    def _exists_table(self, schema_name: str = None, table_name: str = None) -> bool:
         check_command = """
-		SELECT EXISTS (
-			SELECT 1
-			FROM   information_schema.tables 
-			WHERE  table_schema = '{0}'
-			AND    table_name = '{1}'
-		);""".format(
+        SELECT EXISTS (
+            SELECT 1
+            FROM   information_schema.tables 
+            WHERE  table_schema = '{0}'
+            AND    table_name = '{1}'
+        );""".format(
             schema_name, table_name
         )
         check_df = self.get_psql_query_results_as_dataframe(query=check_command)
         return check_df.at[0, "exists"]
 
-    def _drop_table(self, schema_name=None, table_name=None):
+    def _drop_table(self, schema_name: str = None, table_name: str = None) -> NoReturn:
         del_command = 'DROP TABLE IF EXISTS {0}."{1}";'.format(schema_name, table_name)
         self._execute_query(del_command)
-        return
 
-    def _create_table_as(self, query=None, schema_name=None, table_name=None):
+    def _create_table_as(
+        self, query: str = None, schema_name: str = None, table_name: str = None
+    ) -> NoReturn:
         create_command = 'CREATE TABLE {0}."{1}" AS {2}'.format(
             schema_name, table_name, query
         )
         self._execute_query(query=create_command)
-        return
+        return None
 
     def _create_table(
-        self, schema_name=None, table_name=None, column_name_type_dict=None
-    ):
+        self,
+        schema_name: str = None,
+        table_name: str = None,
+        column_name_type_dict: Dict[str, str] = None,
+    ) -> NoReturn:
         column_types = ", ".join(
             [
                 "{0} {1}".format(col_n, col_t)
@@ -223,9 +235,8 @@ class PsqlConnector(object):
             schema_name, table_name, column_types
         )
         self._execute_query(query=create_command)
-        return
 
-    def _correct_float_columns(self, dataframe=None):
+    def _correct_float_columns(self, dataframe: pd.DataFrame = None) -> NoReturn:
         float_32_column_list = PandasOps.get_column_names_by_type(
             dataframe=dataframe, column_dtype="float32"
         )
@@ -235,7 +246,7 @@ class PsqlConnector(object):
         float_column_list = float_32_column_list + float_64_column_list
 
         if len(float_column_list) == 0:
-            return
+            return None
 
         for float_col in float_column_list:
             if PandasOps.contains_all_integer_in_float_column(
@@ -246,9 +257,10 @@ class PsqlConnector(object):
                     .fillna(self._csv_null_identifier["int64"])
                     .astype(int)
                 )
-        return
 
-    def _get_dict_of_column_name_to_type_from_dataframe_for_psql(self, dataframe=None):
+    def _get_dict_of_column_name_to_type_from_dataframe_for_psql(
+        self, dataframe: pd.DataFrame = None
+    ) -> Dict[str, str]:
         pandas_dtype_to_psql_column_type_dict = {
             "int64": "bigint",
             "int32": "bigint",
@@ -282,7 +294,9 @@ class PsqlConnector(object):
 
         return psql_column_name_type_dict
 
-    def _clean_delimiter_in_object_columns_from_dataframe(self, dataframe=None):
+    def _clean_delimiter_in_object_columns_from_dataframe(
+        self, dataframe: pd.DataFrame = None
+    ) -> NoReturn:
         object_column_list = PandasOps.get_column_names_by_type(
             dataframe=dataframe, column_dtype="object"
         )
@@ -295,28 +309,30 @@ class PsqlConnector(object):
                 .replace('"', "'", regex=True)
                 .replace(",", "\|", regex=True)
             )
-        return
 
     def _update_null_in_columns(
-        self, dataframe=None, column_dtype=None, schema_name=None, table_name=None
-    ):
+        self,
+        dataframe: pd.DataFrame = None,
+        column_dtype: np.dtype = None,
+        schema_name: str = None,
+        table_name: str = None,
+    ) -> NoReturn:
         int_columns = PandasOps.get_column_names_by_type(
             dataframe=dataframe, column_dtype=column_dtype
         )
         if len(int_columns) < 1:
-            return
+            return None
 
         update_command = ""
         for int_col in int_columns:
             update_command += """
-				UPDATE {0}.{1}
-				SET {2} = NULL
-				WHERE {2} = {3};
-				""".format(
+                UPDATE {0}.{1}
+                SET {2} = NULL
+                WHERE {2} = {3};
+                """.format(
                 schema_name,
                 table_name,
                 int_col,
                 self._csv_null_identifier[column_dtype],
             )
         self._execute_query(query=update_command)
-        return
