@@ -50,11 +50,13 @@ $ pip install GiantPandas
 #### ```PsqlConnector```
 First, an instance must be created for establishing connection.
 ```python
-psql_connector = PsqlConnector(host='localhost',
-                               dbname='postgres',
-                               username='postgres',
-                               password='',
-                               port='5432')
+psql_connector = PsqlConnector(
+    host="localhost",
+    dbname="postgres",
+    username="postgres",
+    password="",
+    port='5432',
+)
 ```
 Then,
 1. ```psql_connector.get_psql_query_results_as_dataframe(query)```: get results of a psql query as a dataframe

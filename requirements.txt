@@ -5,5 +5,5 @@ psycopg2-binary>=2.8.3
 Unidecode>=1.0.22
 xlrd>=1.2.0
 XlsxWriter>=1.0.2
-DailyLogger>=0.1.2
-FreqObjectOps>=0.1.2
+DailyLogger>=0.1.4
+FreqObjectOps>=0.1.3
