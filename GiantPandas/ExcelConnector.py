@@ -68,7 +68,7 @@ class ExcelConnector(object):
         if file is None:
             return
 
-        folder = DirOps.get_directory_from_filepath(filepath=file)
+        folder = DirOps.get_directory_from_file_path(file_path=file)
         if folder in [None, ""]:
             folder = os.getcwd()
             file = os.path.join(folder, file)

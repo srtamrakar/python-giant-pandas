@@ -72,10 +72,6 @@ def main():
         file=args["file"], sheet_name=args["sheetname"]
     )
 
-    import pdb
-
-    pdb.set_trace()
-
     logger.info("Initializing PSQL connector ... ")
     psql_connector = PsqlConnector(
         host=args["host"],

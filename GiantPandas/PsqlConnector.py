@@ -4,6 +4,7 @@ import re
 import io
 import math
 import psycopg2
+import numpy as np
 import pandas as pd
 from typing import NoReturn, Dict
 from GiantPandas import PandasOps
