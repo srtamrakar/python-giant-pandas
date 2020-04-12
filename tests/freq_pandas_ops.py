@@ -8,7 +8,7 @@ import pandas as pd
 from GiantPandas.PandasOps import PandasOps
 
 test_excel_folder = "tests"
-test_excel_filename = "test.xlsx"
+test_excel_filename = "table_to_psql.xlsx"
 test_excel_file = os.path.join(test_excel_folder, test_excel_filename)
 
 test_df = pd.read_excel(test_excel_file)
@@ -107,7 +107,7 @@ def test_009_set_column_names_to_alpha_numeric():
 
 def test_010_set_column_names_to_snake_case():
     df = test_df.copy()
-    PandasOps.set_column_names_to_snake_case(df)
+    PandasOps.set_column_names_to_snake_case(df, "lower")
     assert list(df.columns) == [
         "id",
         "all_strings",

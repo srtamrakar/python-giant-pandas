@@ -1,18 +1,5 @@
 # GiantPandas
-Some special functions and connectors for Pandas.
-
-## Requirements
-
-* Python 3+ (Tested in 3.7)
-* numpy>=1.13.3
-* pandas>=0.25.0
-* pytest>=5.0.1
-* psycopg2-binary>=2.8.3
-* Unidecode>=1.0.22
-* xlrd>=1.2.0
-* XlsxWriter>=1.0.2
-* DailyLogger>=0.1.2
-* FreqObjectOps>=0.1.0
+Convenient functions and connectors for Pandas.
 
 
 ## Install with pip
@@ -23,7 +10,7 @@ $ pip install GiantPandas
 ## Usage
 1. Import the library.
     ```python
-    from GiantPandas import PandasOps, ExcelConnector, PsqlConnector
+    from GiantPandas import PandasOps, ExcelConnector, PsqlConnector, S3Connector
     ```
 1. Each of the imported submodules has several functions. Please refer to respective help for more information.
 
@@ -55,24 +42,37 @@ psql_connector = PsqlConnector(
     dbname="postgres",
     username="postgres",
     password="",
-    port='5432',
+    port="5432",
 )
 ```
 Then,
 1. ```psql_connector.get_psql_query_results_as_dataframe(query)```: get results of a psql query as a dataframe
-1. ```psql_connector.send_dataframe_to_psql(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
+1. ```psql_connector.upload_dataframe_to_psql(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
+
+
+#### ```S3Connector```
+First, an instance must be created for establishing connection.
+```python
+s3_connector = S3Connector(
+    aws_access_key_id="############",
+    aws_secret_access_key="############",
+    aws_region="############",
+)
+```
+Then,
+1. ```s3_connector.upload_dataframe_as_csv(dataframe, bucket_name, object_name, csv_sep, csv_null_identifier)```: upload pandas dataframe as a csv file into S3 bucket
 
 
 #### Demo
 
 Demo script for saving results of PostgreSQL query into an excel file.
 ```bash
-$ python3 demo/Psql2Excel.py -f test2.xlsx -H localhost -d postgres -u postgres -t test_table -sn Sheet1
+$ python3 demo/Psql2Excel.py -f table_from_psql.xlsx -H localhost -d postgres -u postgres -t test_table -sn Sheet1
 ```
 
 Demo script for uploading a table from excel sheet into a PSQL database.
 ```bash
-$ python3 demo/Excel2Psql.py -f tests/test.xlsx -H localhost -d postgres -u postgres -t test_table
+$ python3 demo/Excel2Psql.py -f tests/table_to_psql.xlsx -H localhost -d postgres -u postgres -t test_table -ie replace
 ```
 
-**&copy; [Samyak Ratna Tamrakar](https://www.linkedin.com/in/srtamrakar/)**, 2019.
+**&copy; [Samyak Ratna Tamrakar](https://www.linkedin.com/in/srtamrakar/)**, 2020.

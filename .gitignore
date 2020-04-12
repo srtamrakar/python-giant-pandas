@@ -1,5 +1,6 @@
 *.DS_Store
 .idea/
+table_from_psql.xlsx
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

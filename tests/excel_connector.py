@@ -6,7 +6,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from GiantPandas.ExcelConnector import ExcelConnector
 
 test_excel_folder = "tests"
-test_excel_filename = "test.xlsx"
+test_excel_filename = "table_to_psql.xlsx"
 test_excel_file = os.path.join(test_excel_folder, test_excel_filename)
 
 

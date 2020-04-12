@@ -1,12 +1,8 @@
-import os
-import sys
 import numpy as np
 import pandas as pd
 import itertools
 from FreqObjectOps import StrOps
 from typing import List, Dict, NoReturn, Union
-
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 
 class PandasOps(object):
@@ -14,37 +10,22 @@ class PandasOps(object):
         pass
 
     @classmethod
-    def get_row_count(cls, dataframe: pd.DataFrame = None) -> int:
-        """
-        Fastest way to count dataframe rows.
-        :param dataframe: pandas.DataFrame
-        :return:
-            row count as int
-        """
-        return len(dataframe.index)
+    def get_row_count(cls, df: pd.DataFrame) -> int:
+        return len(df.index)
 
     @classmethod
     def get_dict_from_two_columns(
         cls,
-        dataframe: pd.DataFrame = None,
-        key_column: str = None,
-        value_column: str = None,
-        keep_duplicate_keys: Union[str, bool] = None,
+        df: pd.DataFrame,
+        key_column: str,
+        value_column: str,
+        keep_duplicate_keys: Union[str, bool] = False,
     ) -> dict:
-        """
-        :param dataframe: pandas.DataFrame
-        :param key_column: str
-        :param value_column: str
-        :param keep_duplicate_keys: 'first' | 'last' | False
-            Whether to drop duplicate keys or to retain only first/last ones
-        :return:
-            dictionary of {items from key_column : items from value_column}
-        """
         keep_duplicate_keys = str(keep_duplicate_keys).lower()
         if keep_duplicate_keys.lower() not in ["first", "last"]:
             keep_duplicate_keys = False
 
-        dataframe_ = dataframe[[key_column, value_column]].copy()
+        dataframe_ = df[[key_column, value_column]].copy()
         dataframe_.drop_duplicates(
             subset=[key_column], keep=keep_duplicate_keys, inplace=True
         )
@@ -54,14 +35,8 @@ class PandasOps(object):
 
     @classmethod
     def get_dataframe_with_all_permutations_from_dict(
-        cls, dict_with_list_values: Dict[str, list] = None
+        cls, dict_with_list_values: Dict[str, list]
     ):
-        """
-        :param dict_with_list_values: dict
-            dictionary with keys of type 'str' and values of type 'list'
-        :return:
-            pandas dataframe with all possible permutations of the lists
-        """
         df = pd.DataFrame(
             list(itertools.product(*dict_with_list_values.values())),
             columns=dict_with_list_values.keys(),
@@ -70,47 +45,21 @@ class PandasOps(object):
 
     @classmethod
     def set_column_as_index(
-        cls,
-        dataframe: pd.DataFrame = None,
-        column_name: str = None,
-        drop_original_column: bool = None,
+        cls, df: pd.DataFrame, column_name: str, drop_original_column: bool = False
     ) -> NoReturn:
-        """
-        :param dataframe: pandas.DataFrame
-        :param column_name: str
-        :param drop_original_column: bool
-            whether or not to drop the column after setting it as index
-        :return:
-            pandas dataframe with column set as index
-        """
-        if drop_original_column is None:
-            drop_original_column = False
-        dataframe.reset_index(drop=True, inplace=True)
-        dataframe.set_index(column_name, inplace=True, drop=drop_original_column)
+        df.reset_index(drop=True, inplace=True)
+        df.set_index(column_name, inplace=True, drop=drop_original_column)
 
     @classmethod
-    def get_dict_of_column_name_to_type(
-        cls, dataframe: pd.DataFrame = None
-    ) -> Dict[str, np.dtype]:
-        """
-        :param dataframe: pandas.DataFrame
-        :return:
-            dictionary of {column name : column dtype}
-        """
-        column_name_type_dict = dataframe.dtypes.apply(lambda x: x.name).to_dict()
+    def get_dict_of_column_name_to_type(cls, df: pd.DataFrame) -> Dict[str, np.dtype]:
+        column_name_type_dict = df.dtypes.apply(lambda x: x.name).to_dict()
         return column_name_type_dict
 
     @classmethod
     def get_column_names_by_type(
-        cls, dataframe: pd.DataFrame = None, column_dtype: Union[np.dtype, str] = None
+        cls, df: pd.DataFrame, column_dtype: Union[np.dtype, str]
     ) -> list:
-        """
-        :param dataframe: pandas.DataFrame
-        :param column_dtype: dtype | str
-        :return:
-            list of column names, which are of dtype column_dtype
-        """
-        column_name_type_dict = cls.get_dict_of_column_name_to_type(dataframe=dataframe)
+        column_name_type_dict = cls.get_dict_of_column_name_to_type(df=df)
         matched_column_list = [
             k
             for k, v in column_name_type_dict.items()
@@ -120,80 +69,44 @@ class PandasOps(object):
 
     @classmethod
     def contains_all_integer_in_float_column(
-        cls, dataframe: pd.DataFrame = None, column_name: str = None
+        cls, df: pd.DataFrame, column_name: str
     ) -> bool:
-        """
-        :param dataframe: pandas.DataFrame
-        :param column_name: str
-        :return:
-            whether all non-nan items in float column are integer
-        """
-        column_values = dataframe[column_name].values.copy()
+        column_values = df[column_name].values.copy()
         column_values = column_values[~np.isnan(column_values)]
         return np.array_equal(column_values, column_values.astype(int))
 
     @classmethod
-    def set_column_names_to_alpha_numeric(
-        cls, dataframe: pd.DataFrame = None
-    ) -> NoReturn:
-        """
-        :param dataframe: pandas.DataFrame
-        :return:
-            dataframe with its columns names changed to alpha-numeric
-        """
-        columns_as_alpha_numeric = list(
-            map(StrOps.text_to_alpha_numeric, dataframe.columns)
+    def set_column_names_to_alpha_numeric(cls, df: pd.DataFrame) -> NoReturn:
+        columns_as_alpha_numeric = list(map(StrOps.text_to_alpha_numeric, df.columns))
+        df.columns = columns_as_alpha_numeric
+
+    @classmethod
+    def set_column_names_to_snake_case(cls, df: pd.DataFrame, case: str) -> NoReturn:
+        columns_as_snake_case = list(
+            map(
+                StrOps.text_to_snake_case,
+                df.columns,
+                itertools.repeat(case, len(df.columns)),
+            )
         )
-        dataframe.columns = columns_as_alpha_numeric
+        df.columns = columns_as_snake_case
 
     @classmethod
-    def set_column_names_to_snake_case(cls, dataframe: pd.DataFrame = None) -> NoReturn:
-        """
-        :param dataframe: pandas.DataFrame
-        :return:
-            dataframe with its columns names changed to snake_case
-        """
-        columns_as_snake_case = list(map(StrOps.text_to_snake_case, dataframe.columns))
-        dataframe.columns = columns_as_snake_case
+    def exists_unnamed_headers(cls, df: pd.DataFrame) -> bool:
+        return any("unnamed" in col.lower() for col in df.columns)
 
     @classmethod
-    def exists_unnamed_headers(cls, dataframe: pd.DataFrame = None) -> bool:
-        """
-        :param dataframe: pandas.DataFrame
-        :return:
-            whether dataframe contains unnamed columns
-        """
-        return any("unnamed" in col.lower() for col in dataframe.columns)
-
-    @classmethod
-    def exists_column(
-        cls, dataframe: pd.DataFrame = None, column_name_list: List[str] = None
-    ) -> bool:
-        """
-        :param dataframe: pandas.DataFrame
-        :param column_name_list: list of str
-        :return:
-            whether dataframe contains all the columns in column_name_list
-        """
-        return set(column_name_list).issubset(set(dataframe.columns))
+    def exists_column(cls, df: pd.DataFrame, column_name_list: List[str]) -> bool:
+        return set(column_name_list).issubset(set(df.columns))
 
     @classmethod
     def get_maximum_length_of_dtype_object_values(
-        cls, dataframe: pd.DataFrame = None, column_name: str = None
+        cls, df: pd.DataFrame, column_name: str
     ) -> int:
-        """
-        :param dataframe: pandas.DataFrame
-        :param column_name: str
-        :return:
-            max length of objects in column
-        """
-
         def __get_length_of_dtype_object(object_value=None):
             try:
                 return len(object_value.encode("utf-8"))
             except:
                 return 1
 
-        return (
-            dataframe[column_name].map(lambda x: __get_length_of_dtype_object(x)).max()
-        )
+        return df[column_name].map(__get_length_of_dtype_object).max()
