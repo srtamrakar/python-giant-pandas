@@ -127,7 +127,7 @@ class PsqlConnector(object):
         csv_io.seek(0)
         cur.copy_from(
             csv_io,
-            "{0}.{1}".format(schema_name, table_name),
+            f"{schema_name}.{table_name}",
             columns=df.columns.tolist(),
             sep=self._csv_sep,
             null=self._csv_null_identifier["general"],
@@ -137,7 +137,7 @@ class PsqlConnector(object):
         self._close_database_connectors(conn, cur)
 
     def _get_psql_array_format_of_python_list(self, python_list: list) -> str:
-        psql_array = "({0})".format(str(python_list)[1:-1])
+        psql_array = f"({str(python_list)[1:-1]})"
         return psql_array
 
     def _execute_query(self, query: str) -> NoReturn:
@@ -146,42 +146,33 @@ class PsqlConnector(object):
         self._close_database_connectors(conn, cur)
 
     def _exists_table(self, schema_name: str, table_name: str) -> bool:
-        check_command = """
+        check_command = f"""
         SELECT EXISTS (
             SELECT 1
             FROM   information_schema.tables 
-            WHERE  table_schema = '{0}'
-            AND    table_name = '{1}'
-        );""".format(
-            schema_name, table_name
-        )
+            WHERE  table_schema = '{schema_name}'
+            AND    table_name = '{table_name}'
+        );"""
         check_df = self.get_psql_query_results_as_dataframe(query=check_command)
         return check_df.at[0, "exists"]
 
     def _drop_table(self, schema_name: str, table_name: str) -> NoReturn:
-        del_command = 'DROP TABLE IF EXISTS {0}."{1}";'.format(schema_name, table_name)
+        del_command = f"""DROP TABLE IF EXISTS {schema_name}."{table_name}";"""
         self._execute_query(del_command)
 
     def _create_table_as(
         self, query: str, table_name: str, schema_name: str
     ) -> NoReturn:
-        create_command = 'CREATE TABLE {0}."{1}" AS {2}'.format(
-            schema_name, table_name, query
-        )
+        create_command = f"""CREATE TABLE {schema_name}."{table_name}" AS {query}"""
         self._execute_query(query=create_command)
 
     def _create_table(
         self, schema_name: str, table_name: str, column_name_type_dict: Dict[str, str],
     ) -> NoReturn:
         column_types = ", ".join(
-            [
-                "{0} {1}".format(col_n, col_t)
-                for col_n, col_t in column_name_type_dict.items()
-            ]
+            [f"{col_n} {col_t}" for col_n, col_t in column_name_type_dict.items()]
         )
-        create_command = 'CREATE TABLE IF NOT EXISTS {0}."{1}" ({2});'.format(
-            schema_name, table_name, column_types
-        )
+        create_command = f"""CREATE TABLE IF NOT EXISTS {schema_name}."{table_name}" ({column_types});"""
         self._execute_query(query=create_command)
 
     def _correct_float_columns(self, df: pd.DataFrame) -> NoReturn:
@@ -224,15 +215,15 @@ class PsqlConnector(object):
             if v != "object":
                 psql_column_name_type_dict[k] = pandas_dtype_to_psql_column_type_dict[v]
             else:
-                max_number_of_characters = PandasOps.get_maximum_length_of_dtype_object_values(
+                max_character_length = PandasOps.get_maximum_length_of_dtype_object_values(
                     df=df, column_name=k
                 )
-                max_number_of_characters = math.ceil(1.25 * max_number_of_characters)
+                max_character_length = math.ceil(1.25 * max_character_length)
 
-                if max_number_of_characters <= 2056:
-                    psql_column_name_type_dict[k] = "character varying({})".format(
-                        max_number_of_characters
-                    )
+                if max_character_length <= 2056:
+                    psql_column_name_type_dict[
+                        k
+                    ] = f"character varying({max_character_length})"
                 else:
                     psql_column_name_type_dict[k] = "text"
 
@@ -269,14 +260,9 @@ class PsqlConnector(object):
 
         update_command = ""
         for int_col in int_columns:
-            update_command += """
-                UPDATE {0}.{1}
-                SET {2} = NULL
-                WHERE {2} = {3};
-                """.format(
-                schema_name,
-                table_name,
-                int_col,
-                self._csv_null_identifier[column_dtype],
-            )
+            update_command += f"""
+                UPDATE {schema_name}.{table_name}
+                SET {int_col} = NULL
+                WHERE {int_col} = {self._csv_null_identifier[column_dtype]};
+                """
         self._execute_query(query=update_command)

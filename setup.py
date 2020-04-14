@@ -4,7 +4,7 @@ from setuptools import setup
 with open(os.path.join(os.path.dirname(__file__), "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
-module_version = "0.1.9"
+module_version = "0.2.0"
 
 setup(
     name="GiantPandas",
