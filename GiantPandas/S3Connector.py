@@ -18,13 +18,13 @@ class S3Connector(object):
     _csv_null_identifier = "#N/A"
 
     def __init__(
-        self, aws_access_key_id: str, aws_secret_access_key: str, aws_region: str
+        self, aws_access_key_id: str, aws_secret_access_key: str, aws_region_name: str
     ) -> NoReturn:
         self.resource = boto3.resource(
             "s3",
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
-            region_name=aws_region,
+            region_name=aws_region_name,
         )
 
     def upload_dataframe_as_csv(
@@ -32,8 +32,8 @@ class S3Connector(object):
         df: pd.DataFrame,
         bucket_name: str,
         object_name: str,
-        csv_sep: str,
-        csv_null_identifier: str,
+        csv_sep: str = None,
+        csv_null_identifier: str = None,
     ) -> NoReturn:
 
         if csv_sep is None:

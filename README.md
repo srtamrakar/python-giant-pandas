@@ -56,7 +56,7 @@ First, an instance must be created for establishing connection.
 s3_connector = S3Connector(
     aws_access_key_id="############",
     aws_secret_access_key="############",
-    aws_region="############",
+    aws_region_name="############",
 )
 ```
 Then,
