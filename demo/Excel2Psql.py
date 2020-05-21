@@ -68,7 +68,7 @@ def main():
             args["schema"], args["table"]
         )
     )
-    psql_connector.upload_dataframe_to_psql(
+    psql_connector.upload_dataframe(
         df=df,
         schema_name=args["schema"],
         table_name=args["table"],

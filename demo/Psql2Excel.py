@@ -45,7 +45,7 @@ def main():
     )
 
     logger.info("Reading psql query results to dataframe ...")
-    df = psql_connector.get_psql_query_results_as_dataframe(
+    df = psql_connector.get_query_results(
         query='SELECT * FROM {0}."{1}";'.format(args["schema"], args["table"])
     )
 

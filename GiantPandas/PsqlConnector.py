@@ -52,13 +52,13 @@ class PsqlConnector(object):
         conn.close()
         return None
 
-    def get_psql_query_results_as_dataframe(self, query: str) -> pd.DataFrame:
+    def get_query_results(self, query: str) -> pd.DataFrame:
         conn, cur = self._get_database_connectors()
         df = pd.read_sql_query(query, con=conn)
         self._close_database_connectors(conn, cur)
         return df
 
-    def upload_dataframe_to_psql(
+    def upload_dataframe(
         self,
         df: pd.DataFrame,
         schema_name: str,
@@ -89,7 +89,7 @@ class PsqlConnector(object):
             ),
         )
 
-        self._upload_dataframe_to_psql(
+        self._insert_df_to_psql(
             df=df_for_upload, schema_name=schema_name, table_name=table_name
         )
 
@@ -101,7 +101,7 @@ class PsqlConnector(object):
                 column_dtype=column_type,
             )
 
-    def _upload_dataframe_to_psql(
+    def _insert_df_to_psql(
         self, df: pd.DataFrame, schema_name: str, table_name: str,
     ) -> NoReturn:
         conn, cur = self._get_database_connectors()
@@ -153,7 +153,7 @@ class PsqlConnector(object):
             WHERE  table_schema = '{schema_name}'
             AND    table_name = '{table_name}'
         );"""
-        check_df = self.get_psql_query_results_as_dataframe(query=check_command)
+        check_df = self.get_query_results(query=check_command)
         return check_df.at[0, "exists"]
 
     def _drop_table(self, schema_name: str, table_name: str) -> NoReturn:

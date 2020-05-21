@@ -15,7 +15,7 @@ $ pip install GiantPandas
 1. Each of the imported submodules has several functions. Please refer to respective help for more information.
 
 #### ```PandasOps```
-
+Methods:
 1. ```PandasOps.get_row_count(dataframe)```: get row count of a dataframe
 1. ```PandasOps.get_dict_from_two_columns(dataframe, key_column, value_column, keep_duplicate_keys)```: get dictionary from two dataframe columns
 1. ```PandasOps.get_dataframe_with_all_permutations_from_dict(dict_with_list_values)```: create dataframe with all possible permutations from dict with values of type list
@@ -30,6 +30,7 @@ $ pip install GiantPandas
 1. ```PandasOps.get_maximum_length_of_dtype_object_values(dataframe, column_name)```: get maximum length of object in a column
 
 #### ```ExcelConnector```
+Methods:
 1. 	```ExcelConnector.get_sheet_names(file)```: get all sheet names
 1. 	```ExcelConnector.get_dataframe_from_excel(file, sheet_name, skip_rows_list)```: read excel sheet into a dataframe
 1. 	```ExcelConnector.send_dataframe_to_excel(file, dataframe_to_sheet_name_tuple_list, write_index)```: write dataframe to an excel sheet
@@ -41,26 +42,30 @@ psql_connector = PsqlConnector(
     host="localhost",
     dbname="postgres",
     username="postgres",
-    password="",
+    password="##########",
     port="5432",
 )
 ```
-Then,
-1. ```psql_connector.get_psql_query_results_as_dataframe(query)```: get results of a psql query as a dataframe
-1. ```psql_connector.upload_dataframe_to_psql(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
+Methods:
+1. ```psql_connector.get_query_results(query)```: get results of a psql query as a dataframe
+1. ```psql_connector.upload_dataframe(dataframe, schema_name, table_name, if_exists)```: upload dataframe to psql
 
 
 #### ```S3Connector```
-First, an instance must be created for establishing connection.
+AWS credentials are [fetched by boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/configuration.html). Desired credentials can be passed while initializing `S3Connector`. In order to configure client connection, pass a [`botocore.config.Config`](https://botocore.amazonaws.com/v1/documentation/api/latest/reference/config.html) object.
 ```python
 s3_connector = S3Connector(
     aws_access_key_id="############",
     aws_secret_access_key="############",
-    aws_region_name="############",
+    aws_region="############",
+    config=botocore.config.Config(
+        connect_timeout=60,
+        read_timeout=60,
+    ),
 )
 ```
-Then,
-1. ```s3_connector.upload_dataframe_as_csv(dataframe, bucket_name, object_name, csv_sep, csv_null_identifier)```: upload pandas dataframe as a csv file into S3 bucket
+Methods:
+1. ```s3_connector.upload_dataframe_as_csv(dataframe, bucket, object_key, csv_sep, csv_null_identifier, include_header, include_index, encoding)```: upload pandas dataframe as a csv file into S3 bucket
 
 
 #### Demo

@@ -1,35 +1,56 @@
 import os
-from setuptools import setup
+import re
+from setuptools import setup, find_packages
 
-with open(os.path.join(os.path.dirname(__file__), "README.md"), encoding="utf-8") as f:
-    long_description = f.read()
+ROOT = os.path.dirname(__file__)
+MODULE_NAME = "GiantPandas"
 
-module_version = "0.2.0"
+
+def get_author() -> str:
+    author_re = re.compile(r"""__author__ = ['"]([A-Za-z .]+)['"]""")
+    init = open(os.path.join(ROOT, MODULE_NAME, "__init__.py")).read()
+    return author_re.search(init).group(1)
+
+
+def get_version() -> str:
+    version_re = re.compile(r"""__version__ = ['"]([0-9.]+)['"]""")
+    init = open(os.path.join(ROOT, MODULE_NAME, "__init__.py")).read()
+    return version_re.search(init).group(1)
+
+
+def get_description() -> str:
+    with open(os.path.join(ROOT, "README.md"), encoding="utf-8") as f:
+        description = f.read()
+    return description
+
+
+REQUIRED_LIBRARIES = [
+    "boto3>=1.12.37",
+    "botocore>=1.15.39",
+    "numpy>=1.13.3",
+    "pandas>=0.25.0",
+    "pytest>=5.0.1",
+    "psycopg2-binary>=2.8.3",
+    "Unidecode>=1.0.22",
+    "xlrd>=1.2.0",
+    "XlsxWriter>=1.0.2",
+    "FreqObjectOps>=0.1.4",
+]
+
 
 setup(
-    name="GiantPandas",
-    packages=["GiantPandas"],
-    version=module_version,
+    name=MODULE_NAME,
+    packages=find_packages(),
+    version=get_version(),
     license="MIT",
     description="Convenient functions and connectors for Pandas.",
-    long_description=long_description,
+    long_description=get_description(),
     long_description_content_type="text/markdown",
-    author="Samyak Ratna Tamrakar",
-    author_email="samyak.r.tamrakar@gmail.com",
-    url="https://github.com/srtamrakar/python-giant-pandas",
-    download_url=f"https://github.com/srtamrakar/python-giant-pandas/archive/v_{module_version}.tar.gz",
+    author=get_author(),
+    rl="https://github.com/srtamrakar/python-giant-pandas",
+    download_url=f"https://github.com/srtamrakar/python-giant-pandas/archive/v_{get_version()}.tar.gz",
     keywords=["pandas", "excel", "postgres", "psql", "postgresql", "redshift", "s3"],
-    install_requires=[
-        "boto3>=1.12.37",
-        "numpy>=1.13.3",
-        "pandas>=0.25.0",
-        "pytest>=5.0.1",
-        "psycopg2-binary>=2.8.3",
-        "Unidecode>=1.0.22",
-        "xlrd>=1.2.0",
-        "XlsxWriter>=1.0.2",
-        "FreqObjectOps>=0.1.4",
-    ],
+    install_requires=REQUIRED_LIBRARIES,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
