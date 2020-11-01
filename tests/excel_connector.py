@@ -10,5 +10,5 @@ test_excel_filename = "table_to_psql.xlsx"
 test_excel_file = os.path.join(test_excel_folder, test_excel_filename)
 
 
-def test_001_get_sheet_names():
+def test_get_sheet_names():
     assert ExcelConnector.get_sheet_names(test_excel_file) == ["sheet_1", "sheet_2"]

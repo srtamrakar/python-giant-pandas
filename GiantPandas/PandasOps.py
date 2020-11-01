@@ -1,8 +1,10 @@
+import itertools
 import numpy as np
 import pandas as pd
-import itertools
 from FreqObjectOps import StrOps
 from typing import List, Dict, NoReturn, Union
+
+from .exceptions import InvalidOptionError
 
 
 class PandasOps(object):
@@ -21,17 +23,16 @@ class PandasOps(object):
         value_column: str,
         keep_duplicate_keys: Union[str, bool] = False,
     ) -> dict:
-        keep_duplicate_keys = str(keep_duplicate_keys).lower()
-        if keep_duplicate_keys.lower() not in ["first", "last"]:
-            keep_duplicate_keys = False
+        keep_duplicate_keys_allowed_value_list = ["first", "last", False]
 
-        dataframe_ = df[[key_column, value_column]].copy()
-        dataframe_.drop_duplicates(
-            subset=[key_column], keep=keep_duplicate_keys, inplace=True
-        )
-        return pd.Series(
-            dataframe_[value_column].values, index=dataframe_[key_column]
-        ).to_dict()
+        if keep_duplicate_keys not in keep_duplicate_keys_allowed_value_list:
+            raise InvalidOptionError(
+                keep_duplicate_keys, keep_duplicate_keys_allowed_value_list
+            )
+
+        df_ = df[[key_column, value_column]].copy()
+        df_.drop_duplicates(subset=[key_column], keep=keep_duplicate_keys, inplace=True)
+        return pd.Series(df_[value_column].values, index=df_[key_column]).to_dict()
 
     @classmethod
     def get_dataframe_with_all_permutations_from_dict(

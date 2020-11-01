@@ -1,5 +1,3 @@
-import os
-import sys
 import re
 import io
 import math
@@ -7,10 +5,9 @@ import psycopg2
 import numpy as np
 import pandas as pd
 from typing import NoReturn, Dict, Tuple, Union
-from GiantPandas import PandasOps
-from GiantPandas.exceptions import InvalidValue
 
-sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from . import PandasOps
+from .exceptions import InvalidOptionError
 
 
 class PsqlConnector(object):
@@ -69,7 +66,7 @@ class PsqlConnector(object):
         if_exists_allowed_value_list = ["replace", "append"]
 
         if if_exists not in if_exists_allowed_value_list:
-            raise InvalidValue(if_exists, if_exists_allowed_value_list)
+            raise InvalidOptionError(if_exists, if_exists_allowed_value_list)
 
         df_for_upload = df.copy()
 
@@ -84,7 +81,7 @@ class PsqlConnector(object):
         self._create_table(
             schema_name=schema_name,
             table_name=table_name,
-            column_name_type_dict=self._get_dict_of_column_name_to_type_from_dataframe_for_psql(
+            column_name_type_dict=self._get_dict_of_column_name_to_psql_type(
                 df_for_upload
             ),
         )
@@ -102,7 +99,10 @@ class PsqlConnector(object):
             )
 
     def _insert_df_to_psql(
-        self, df: pd.DataFrame, schema_name: str, table_name: str,
+        self,
+        df: pd.DataFrame,
+        schema_name: str,
+        table_name: str,
     ) -> NoReturn:
         conn, cur = self._get_database_connectors()
 
@@ -167,7 +167,10 @@ class PsqlConnector(object):
         self._execute_query(query=create_command)
 
     def _create_table(
-        self, schema_name: str, table_name: str, column_name_type_dict: Dict[str, str],
+        self,
+        schema_name: str,
+        table_name: str,
+        column_name_type_dict: Dict[str, str],
     ) -> NoReturn:
         column_types = ", ".join(
             [f"{col_n} {col_t}" for col_n, col_t in column_name_type_dict.items()]
@@ -195,9 +198,7 @@ class PsqlConnector(object):
                     df[float_col].fillna(self._csv_null_identifier["int64"]).astype(int)
                 )
 
-    def _get_dict_of_column_name_to_type_from_dataframe_for_psql(
-        self, df: pd.DataFrame
-    ) -> Dict[str, str]:
+    def _get_dict_of_column_name_to_psql_type(self, df: pd.DataFrame) -> Dict[str, str]:
         pandas_dtype_to_psql_column_type_dict = {
             "int64": "bigint",
             "int32": "bigint",
@@ -215,8 +216,10 @@ class PsqlConnector(object):
             if v != "object":
                 psql_column_name_type_dict[k] = pandas_dtype_to_psql_column_type_dict[v]
             else:
-                max_character_length = PandasOps.get_maximum_length_of_dtype_object_values(
-                    df=df, column_name=k
+                max_character_length = (
+                    PandasOps.get_maximum_length_of_dtype_object_values(
+                        df=df, column_name=k
+                    )
                 )
                 max_character_length = math.ceil(1.25 * max_character_length)
 

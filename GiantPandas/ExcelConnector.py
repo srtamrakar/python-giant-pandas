@@ -44,16 +44,17 @@ class ExcelConnector(object):
         df_to_sheet_name_tuple_list: List[Tuple[pd.DataFrame, str]],
         write_index: bool = False,
     ) -> NoReturn:
-        folder = DirOps.get_directory_from_file_path(file_path=file_path)
-        if folder in [None, ""]:
-            folder = os.getcwd()
-            file_path = os.path.join(folder, file_path)
+        dir_ = DirOps.get_dir_from_file_path(file_path=file_path)
+        if dir_ in [None, ""]:
+            dir_ = os.getcwd()
 
-        if not DirOps.exists_folder(folder):
-            os.makedirs(folder)
+        abs_file_path = os.path.join(dir_, file_path)
+
+        if not DirOps.exists_dir(dir_):
+            os.makedirs(dir_)
 
         writer = pd.ExcelWriter(
-            file_path, engine="xlsxwriter", options={"strings_to_urls": False}
+            abs_file_path, engine="xlsxwriter", options={"strings_to_urls": False}
         )
         for df, sheet in df_to_sheet_name_tuple_list:
             if PandasOps.get_row_count(df) == 0:

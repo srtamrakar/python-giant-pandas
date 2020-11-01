@@ -1,7 +1,7 @@
 from typing import Any, NoReturn
 
 
-class InvalidValue(Exception):
+class InvalidOptionError(Exception):
     def __init__(self, value: Any, allowed_value_list: list) -> NoReturn:
         self.value = value
         self.allowed_value_list = allowed_value_list

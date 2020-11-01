@@ -19,7 +19,7 @@ class S3Connector(object):
         connect_timeout=60,
         read_timeout=60,
         max_pool_connections=50,
-        retries={"max_attempts": 4},
+        retries={"max_attempts": 3},
     )
     aws_default_region = "eu-central-1"
 
@@ -42,7 +42,9 @@ class S3Connector(object):
         self._create_client(aws_access_key_id, aws_secret_access_key)
 
     def _create_client(
-        self, aws_access_key_id: str = None, aws_secret_access_key: str = None,
+        self,
+        aws_access_key_id: str = None,
+        aws_secret_access_key: str = None,
     ) -> NoReturn:
 
         if any(cred is None for cred in [aws_access_key_id, aws_secret_access_key]):

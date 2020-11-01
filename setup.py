@@ -24,17 +24,17 @@ def get_description() -> str:
     return description
 
 
-REQUIRED_LIBRARIES = [
-    "boto3>=1.12.37",
-    "botocore>=1.15.39",
-    "numpy>=1.13.3",
-    "pandas>=0.25.0",
-    "pytest>=5.0.1",
-    "psycopg2-binary>=2.8.3",
-    "Unidecode>=1.0.22",
+dependencies_list = [
+    "boto3>=1.16.9",
+    "botocore>=1.19.9",
+    "numpy>=1.19.3",
+    "pandas>=1.1.4",
+    "pytest>=6.1.2",
+    "psycopg2-binary>=2.8.6",
+    "Unidecode>=1.1.1",
     "xlrd>=1.2.0",
-    "XlsxWriter>=1.0.2",
-    "FreqObjectOps>=0.1.4",
+    "XlsxWriter>=1.3.7",
+    "FreqObjectOps>=0.1.5",
 ]
 
 
@@ -47,16 +47,16 @@ setup(
     long_description=get_description(),
     long_description_content_type="text/markdown",
     author=get_author(),
-    rl="https://github.com/srtamrakar/python-giant-pandas",
+    url="https://github.com/srtamrakar/python-giant-pandas",
     download_url=f"https://github.com/srtamrakar/python-giant-pandas/archive/v_{get_version()}.tar.gz",
     keywords=["pandas", "excel", "postgres", "psql", "postgresql", "redshift", "s3"],
-    install_requires=REQUIRED_LIBRARIES,
+    install_requires=dependencies_list,
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Topic :: Database :: Database Engines/Servers",
         "License :: OSI Approved :: MIT License",
-        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
 )
